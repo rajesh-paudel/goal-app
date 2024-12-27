@@ -77,4 +77,11 @@ export const logout = (req, res) => {
 };
 
 //auth check
-export const check = (req, res) => {};
+export const check = (req, res) => {
+  try {
+    res.status(200).json(req.user);
+  } catch (error) {
+    console.log("check auth error", error);
+    res.status(500).json({ message: "internal server error" });
+  }
+};
