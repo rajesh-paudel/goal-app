@@ -1,49 +1,40 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { axiosInstance } from "../utils/axios";
 import toast from "react-hot-toast";
-const getGoals = createAsyncThunk(
+export const getGoals = createAsyncThunk(
   "getGoals",
   async (_, { rejectWithValue }) => {
     try {
-      const res = axiosInstance.get("/goals/getGoals");
+      const res = await axiosInstance.get("/goals/getGoals");
+
       return res.data;
     } catch (error) {
-      rejectWithValue(error.response.data);
+      rejectWithValue(error.response.data.message);
     }
   }
 );
 
-const createGoal = createAsyncThunk(
+export const createGoal = createAsyncThunk(
   "createGoal",
   async (goal, { rejectWithValue }) => {
     try {
-      const res = axiosInstance.post("/goals/createGoal", goal);
+      const res = await axiosInstance.post("/goals/createGoal", { goal });
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-const updateGoal = createAsyncThunk(
-  "updateGoal",
-  async ({ id, goal }, { rejectWithValue }) => {
-    try {
-      const res = axiosInstance.put(`/goals/updateGoal/${id}`, goal);
-      return res.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response.data.message);
     }
   }
 );
 
-const deleteGoal = createAsyncThunk(
+export const deleteGoal = createAsyncThunk(
   "deleteGoal",
   async (id, { rejectWithValue }) => {
     try {
-      const res = axiosInstance.delete(`/goals/deleteGoal/${id}`);
+      const res = await axiosInstance.delete(`/goals/deleteGoal/${id}`);
+
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response.data.message);
     }
   }
 );
@@ -66,32 +57,32 @@ const goalSlice = createSlice({
     builder.addCase(getGoals.rejected, (state, action) => {
       state.isError = true;
       state.isLoading = false;
+      toast.error(action.payload);
     });
     builder.addCase(createGoal.pending, (state, action) => {
       state.isLoading = true;
     });
     builder.addCase(createGoal.fulfilled, (state, action) => {
       state.isLoading = false;
+      state.goals.push(action.payload.goal);
+
+      toast.success(action.payload.message);
     });
     builder.addCase(createGoal.rejected, (state, action) => {
       state.isError = true;
       state.isLoading = false;
+      toast.error(action.payload);
     });
-    builder.addCase(updateGoal.pending, (state, action) => {
-      state.isLoading = true;
-    });
-    builder.addCase(updateGoal.fulfilled, (state, action) => {
-      state.isLoading = false;
-    });
-    builder.addCase(updateGoal.rejected, (state, action) => {
-      state.isError = true;
-      state.isLoading = false;
-    });
+
     builder.addCase(deleteGoal.pending, (state, action) => {
       state.isLoading = true;
     });
     builder.addCase(deleteGoal.fulfilled, (state, action) => {
       state.isLoading = false;
+      state.goals = state.goals.filter(
+        (goal) => goal._id !== action.payload.goal._id
+      );
+      toast.success(action.payload.message);
     });
     builder.addCase(deleteGoal.rejected, (state, action) => {
       state.isError = true;

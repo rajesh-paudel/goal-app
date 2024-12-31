@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { axiosInstance } from "../utils/axios";
+import toast from "react-hot-toast";
 
 export const checkAuth = createAsyncThunk(
   "checkAuth",
@@ -9,7 +10,7 @@ export const checkAuth = createAsyncThunk(
 
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response.data.message);
     }
   }
 );
@@ -20,7 +21,7 @@ export const signup = createAsyncThunk(
       const res = await axiosInstance.post("/users/signup", formData);
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response.data.message);
     }
   }
 );
@@ -32,7 +33,7 @@ export const login = createAsyncThunk(
 
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response.data.message);
     }
   }
 );
@@ -43,7 +44,7 @@ export const logout = createAsyncThunk(
       const res = await axiosInstance.post("/users/logout");
       return res.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response.data.message);
     }
   }
 );
@@ -62,7 +63,6 @@ const authSlice = createSlice({
     });
     builder.addCase(checkAuth.fulfilled, (state, action) => {
       state.isLoading = false;
-
       state.authUser = action.payload;
     });
     builder.addCase(checkAuth.rejected, (state, action) => {
@@ -79,6 +79,7 @@ const authSlice = createSlice({
     builder.addCase(signup.rejected, (state, action) => {
       state.isLoading = false;
       state.isError = true;
+      toast.error(action.payload);
     });
     builder.addCase(login.pending, (state, action) => {
       state.isLoading = true;
@@ -90,6 +91,7 @@ const authSlice = createSlice({
     builder.addCase(login.rejected, (state, action) => {
       state.isLoading = false;
       state.isError = true;
+      toast.error(action.payload);
     });
     builder.addCase(logout.pending, (state, action) => {
       state.isLoading = true;
@@ -101,6 +103,7 @@ const authSlice = createSlice({
     builder.addCase(logout.rejected, (state, action) => {
       state.isLoading = false;
       state.isError = true;
+      toast.error(action.payload);
     });
   },
 });

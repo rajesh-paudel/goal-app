@@ -11,7 +11,7 @@ export default function Navbar() {
     dispatch(logout());
   };
   return (
-    <div className="flex justify-between items-center px-20 py-5 mb-10">
+    <div className="  flex justify-between items-center px-20 py-5 mb-10">
       <Link to={"/"} className="logo font-bold text-2xl">
         Goal-app
       </Link>
